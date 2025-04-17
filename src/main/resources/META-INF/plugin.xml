@@ -1,0 +1,48 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>org.clean.architecture</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Flutter Clean Architecture Helper</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="diego.palomaresgarcia@gmail.com" url="https://github.com/DarkShadow-Infinity">NeoShadow</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    Adds a generator to the <em>New</em> context menu to create the Clean-Architecture folder structure for a given feature.
+    ]]></description>
+
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+
+    </extensions>
+
+    <actions>
+        <group id="org.clean.architecture.action.ActionGroup"  popup="true"
+            class="org.clean.architecture.action.ActionGroup" text="Clean Generator"
+            description="Choose a Clean-Architecture variant">
+
+            <!-- Añadir al grupo 'New' después de la acción 'New File' -->
+            <add-to-group anchor="after" group-id="NewGroup" relative-to-action="NewDir" />
+
+            <!-- Acción para Flutter -->
+            <action id="org.clean.architecture.action.ActionGenerateFlutter"
+                class="org.clean.architecture.action.ActionGenerateFlutter" text="Clean Generator Flutter"
+                description="Generate a new Clean-Architecture for Flutter">
+            </action>
+        </group>
+    </actions>
+</idea-plugin>
