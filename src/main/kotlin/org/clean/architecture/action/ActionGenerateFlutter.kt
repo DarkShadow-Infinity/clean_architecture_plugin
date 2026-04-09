@@ -14,6 +14,8 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.vfs.VirtualFile
 import org.clean.architecture.generator.Generator
+import org.clean.architecture.settings.CleanArchitectureSettings
+import org.clean.architecture.ui.ArchitectureStyle
 import org.clean.architecture.ui.FeatureDialog
 
 /**
@@ -28,17 +30,26 @@ class ActionGenerateFlutter : AnAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val dialog = FeatureDialog(actionEvent.project)
         if (dialog.showAndGet()) {
-            generate(actionEvent.dataContext, dialog.getName(), dialog.splitSource())
+            generate(actionEvent.dataContext, dialog.getName(), dialog.splitSource(), dialog.getArchitectureStyle())
         }
     }
 
     /**
      * Generates the Flutter Clean-Architecture structure in a [dataContext].
      * If a [root] String is provided, it will create the structure in a new folder.
+     * The [style] preset defines layer names and any extra directories.
      */
-    private fun generate(dataContext: DataContext, root: String?, splitSource: Boolean?) {
+    private fun generate(dataContext: DataContext, root: String?, splitSource: Boolean, style: ArchitectureStyle) {
         val project = CommonDataKeys.PROJECT.getData(dataContext) ?: return
         val selected = PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) ?: return
+
+        val settings = CleanArchitectureSettings.getInstance()
+        val state = settings.state
+
+        // Resolve layer names: preset value takes priority, falls back to Settings when null
+        val domainName       = style.domainName       ?: state.domainLayerName
+        val dataName         = style.dataName         ?: state.dataLayerName
+        val presentationName = style.presentationName ?: state.presentationLayerName
 
         var folder = if (selected.isDirectory) selected else selected.parent
         WriteCommandAction.runWriteCommandAction(project) {
@@ -48,41 +59,57 @@ class ActionGenerateFlutter : AnAction() {
                 ) ?: return@runWriteCommandAction
                 folder = result[root]
             }
-            if (splitSource != null && splitSource) {
+
+            // Generate data layer
+            if (splitSource) {
                 val mapOrFalse = Generator.createFolder(
                     project, folder,
-                    "data",
-                    "repositories"
+                    dataName,
+                    state.dataRepositoriesName
                 ) ?: return@runWriteCommandAction
-                mapOrFalse["data"]?.let { data: VirtualFile ->
+                mapOrFalse[dataName]?.let { data: VirtualFile ->
                     Generator.createFolder(
                         project, data,
                         "local",
-                        "models", "data_sources"
+                        state.dataModelsName, state.dataDataSourcesName
                     )
                     Generator.createFolder(
                         project, data,
                         "remote",
-                        "models", "data_sources"
+                        state.dataModelsName, state.dataDataSourcesName
                     )
                 }
             } else {
                 Generator.createFolder(
                     project, folder,
-                    "data",
-                    "repositories", "data_sources", "models"
+                    dataName,
+                    state.dataRepositoriesName, state.dataDataSourcesName, state.dataModelsName
                 )
             }
+
+            // Generate domain layer
             Generator.createFolder(
                 project, folder,
-                "domain",
-                "repositories", "use_cases", "entities"
+                domainName,
+                state.domainRepositoriesName, state.domainUseCasesName, state.domainEntitiesName
             )
+
+            // Generate presentation layer
             Generator.createFolder(
                 project, folder,
-                "presentation",
-                "manager", "pages", "widgets"
+                presentationName,
+                state.presentationManagerName, state.presentationPagesName, state.presentationWidgetsName
             )
+
+            // Generate extra directories from selected architecture style
+            for (extraDir in style.extraDirectories) {
+                Generator.createFolder(project, folder, extraDir)
+            }
+
+            // Generate custom directories from Settings
+            for (customDir in settings.getCustomDirectoriesList()) {
+                Generator.createFolder(project, folder, customDir)
+            }
         }
     }
 }

@@ -27,7 +27,16 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
+        <!-- Settings configurable under Settings > Tools > Clean Architecture -->
+        <applicationConfigurable
+            parentId="tools"
+            instance="org.clean.architecture.settings.CleanArchitectureConfigurable"
+            id="org.clean.architecture.settings.CleanArchitectureConfigurable"
+            displayName="Clean Architecture"/>
+        
+        <!-- Application-level service for persistent settings -->
+        <applicationService
+            serviceImplementation="org.clean.architecture.settings.CleanArchitectureSettings"/>
     </extensions>
 
     <actions>
