@@ -74,3 +74,28 @@ class CleanArchitectureSettings : PersistentStateComponent<CleanArchitectureSett
         }
     }
 }
+
+fun CleanArchitectureSettings.State.normalized(): CleanArchitectureSettings.State {
+    val defaults = CleanArchitectureSettings.State()
+    fun valueOrDefault(value: String, fallback: String): String = value.trim().ifBlank { fallback }
+
+    return copy(
+        domainLayerName = valueOrDefault(domainLayerName, defaults.domainLayerName),
+        dataLayerName = valueOrDefault(dataLayerName, defaults.dataLayerName),
+        presentationLayerName = valueOrDefault(presentationLayerName, defaults.presentationLayerName),
+        customDirectories = customDirectories.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .joinToString(","),
+        domainRepositoriesName = valueOrDefault(domainRepositoriesName, defaults.domainRepositoriesName),
+        domainUseCasesName = valueOrDefault(domainUseCasesName, defaults.domainUseCasesName),
+        domainEntitiesName = valueOrDefault(domainEntitiesName, defaults.domainEntitiesName),
+        dataRepositoriesName = valueOrDefault(dataRepositoriesName, defaults.dataRepositoriesName),
+        dataDataSourcesName = valueOrDefault(dataDataSourcesName, defaults.dataDataSourcesName),
+        dataModelsName = valueOrDefault(dataModelsName, defaults.dataModelsName),
+        presentationManagerName = valueOrDefault(presentationManagerName, defaults.presentationManagerName),
+        presentationPagesName = valueOrDefault(presentationPagesName, defaults.presentationPagesName),
+        presentationWidgetsName = valueOrDefault(presentationWidgetsName, defaults.presentationWidgetsName)
+    )
+}

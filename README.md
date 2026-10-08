@@ -37,7 +37,7 @@ Generated using your Settings configuration:
 
 **4. Settings Used**
 Customize layer names and add directories in Settings:
-![settings custom](/assets/settings_default.png)
+![settings default](/assets/settings_default.png)
 
 ---
 
@@ -115,6 +115,25 @@ Go to `Settings > Tools > Clean Architecture` to customize:
 | Data subdirectories | `data_sources`, `models`, `repositories` | `datasources`, `dtos`, `repos` |
 | Presentation subdirectories | `manager`, `pages`, `widgets` | `blocs`, `screens`, `components` |
 | Custom directories | *(empty)* | `widgets, utils, common` |
+
+## Development
+
+The project has public defaults for local development, so a private `gradle.properties` file is not
+required for a build:
+
+The current validation matrix uses Gradle 9 and JDK 21 to match Android Studio 2026.x.
+
+```bash
+./gradlew build
+./gradlew verifyPlugin
+```
+
+`verifyPlugin` valida la estructura del plugin y la compatibilidad con las versiones estables y patch
+de Android Studio entre los builds `261.*` y `262.*`.
+
+Signing and publishing values remain optional and can be supplied through Gradle properties or the
+corresponding environment variables. `SINCE_BUILD` and `UNTIL_BUILD` can be overridden through the
+`.env` file when targeting a different IDE range.
 
 ## Source
 - https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html

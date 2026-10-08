@@ -89,6 +89,7 @@ class CleanArchitectureConfigurable : Configurable {
             .addComponentFillVertically(JPanel(), 0)
             .panel
 
+        reset()
         return settingsPanel!!
     }
 
@@ -113,24 +114,24 @@ class CleanArchitectureConfigurable : Configurable {
 
     override fun apply() {
         val settings = CleanArchitectureSettings.getInstance()
-        val state = settings.state
-        
-        state.domainLayerName = domainLayerField.text.ifBlank { "domain" }
-        state.dataLayerName = dataLayerField.text.ifBlank { "data" }
-        state.presentationLayerName = presentationLayerField.text.ifBlank { "presentation" }
-        state.customDirectories = customDirectoriesField.text
-        
-        state.domainRepositoriesName = domainRepositoriesField.text.ifBlank { "repositories" }
-        state.domainUseCasesName = domainUseCasesField.text.ifBlank { "use_cases" }
-        state.domainEntitiesName = domainEntitiesField.text.ifBlank { "entities" }
-        
-        state.dataRepositoriesName = dataRepositoriesField.text.ifBlank { "repositories" }
-        state.dataDataSourcesName = dataDataSourcesField.text.ifBlank { "data_sources" }
-        state.dataModelsName = dataModelsField.text.ifBlank { "models" }
-        
-        state.presentationManagerName = presentationManagerField.text.ifBlank { "manager" }
-        state.presentationPagesName = presentationPagesField.text.ifBlank { "pages" }
-        state.presentationWidgetsName = presentationWidgetsField.text.ifBlank { "widgets" }
+        settings.loadState(
+            settings.state.copy(
+                domainLayerName = domainLayerField.text,
+                dataLayerName = dataLayerField.text,
+                presentationLayerName = presentationLayerField.text,
+                customDirectories = customDirectoriesField.text,
+                domainRepositoriesName = domainRepositoriesField.text,
+                domainUseCasesName = domainUseCasesField.text,
+                domainEntitiesName = domainEntitiesField.text,
+                dataRepositoriesName = dataRepositoriesField.text,
+                dataDataSourcesName = dataDataSourcesField.text,
+                dataModelsName = dataModelsField.text,
+                presentationManagerName = presentationManagerField.text,
+                presentationPagesName = presentationPagesField.text,
+                presentationWidgetsName = presentationWidgetsField.text
+            ).normalized()
+        )
+        reset()
     }
 
     override fun reset() {
