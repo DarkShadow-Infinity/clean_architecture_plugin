@@ -20,7 +20,7 @@ interface Generator {
         private val logger = Logger.getInstance(Generator::class.java)
 
         fun createTree(
-            project: Project,
+            project: Project?,
             folder: VirtualFile,
             roots: List<DirectorySpec>
         ): Boolean {
