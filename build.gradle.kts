@@ -1,6 +1,7 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 val pluginName: String = providers.gradleProperty("pluginName")
     .orElse("Flutter Clean Architecture Helper")
@@ -94,7 +95,7 @@ intellijPlatform {
                 <li>New Core/UI/Widgets preset creates core/, ui/, and top-level widgets/ folder</li>
                 <li>Custom option reads layer names from Settings > Tools > Clean Architecture</li>
                 <li>Build compatibility now reads from .env file (SINCE_BUILD, UNTIL_BUILD)</li>
-                <li>Improved compatibility with Android Studio 2026.2+ (build 262+)</li>
+                <li>Improved compatibility with Android Studio 2026.1+ (build 261+)</li>
             </ul>
             <h2>v1.0.1</h2>
             <ul>
@@ -165,4 +166,8 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
+}
+
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
