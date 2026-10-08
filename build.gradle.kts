@@ -12,7 +12,7 @@ val pluginVersion: String = providers.gradleProperty("pluginVersion")
     .orElse("1.1.0")
     .get()
 val ideaVersion: String = providers.gradleProperty("ideaVersion")
-    .orElse("2024.3.7")
+    .orElse("2026.1.4")
     .get()
 val vendorName: String = providers.gradleProperty("vendorName")
     .orElse("NeoShadow")
@@ -47,7 +47,8 @@ if (envFile.exists()) {
 }
 
 // Read build compatibility from .env or use defaults
-val sinceBuildValue: String = System.getProperty("SINCE_BUILD") ?: "233"
+// Android Studio 2026.1 (261) is the first supported runtime for the Java 21-era platform line.
+val sinceBuildValue: String = System.getProperty("SINCE_BUILD") ?: "261"
 val untilBuildValue: String = System.getProperty("UNTIL_BUILD") ?: "262.*"
 
 plugins {
@@ -70,7 +71,7 @@ repositories {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html#setting-up-intellij-platform
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(ideaVersion) {
+        intellijIdea(ideaVersion) {
             useInstaller = false
         }
         bundledPlugin("com.intellij.java")
@@ -136,8 +137,8 @@ intellijPlatform {
             select {
                 types = listOf(IntelliJPlatformType.AndroidStudio)
                 channels = listOf(ProductRelease.Channel.RELEASE, ProductRelease.Channel.PATCH)
-                sinceBuild = "261"
-                untilBuild = "262.*"
+                sinceBuild = sinceBuildValue
+                untilBuild = untilBuildValue
             }
         }
     }
@@ -148,8 +149,8 @@ tasks {
         useJUnitPlatform()
     }
     withType<JavaCompile> {
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 }
 
@@ -162,6 +163,6 @@ java {
 kotlin {
     jvmToolchain(21)
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }

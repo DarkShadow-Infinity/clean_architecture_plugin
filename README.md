@@ -121,7 +121,8 @@ Go to `Settings > Tools > Clean Architecture` to customize:
 The project has public defaults for local development, so a private `gradle.properties` file is not
 required for a build:
 
-The current validation matrix uses Gradle 9 and JDK 21 to match Android Studio 2026.x.
+The build uses Gradle 9 and JDK 21. The plugin bytecode targets Java 17 so it can run on
+Android Studio versions whose runtime is Java 17 as well as newer Java 21-based releases.
 
 ```bash
 ./gradlew build
@@ -129,7 +130,8 @@ The current validation matrix uses Gradle 9 and JDK 21 to match Android Studio 2
 ```
 
 `verifyPlugin` valida la estructura del plugin y la compatibilidad con las versiones estables y patch
-de Android Studio entre los builds `261.*` y `262.*`.
+de Android Studio dentro del mismo rango declarado por `SINCE_BUILD` y `UNTIL_BUILD` (por defecto,
+`261` a `262.*`, Android Studio 2026.1 a 2026.2).
 
 Signing and publishing values remain optional and can be supplied through Gradle properties or the
 corresponding environment variables. `SINCE_BUILD` and `UNTIL_BUILD` can be overridden through the
