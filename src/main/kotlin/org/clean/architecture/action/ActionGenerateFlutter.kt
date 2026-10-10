@@ -12,11 +12,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.vfs.VirtualFile
 import org.clean.architecture.generator.Generator
+import org.clean.architecture.generator.GenerationPlan
 import org.clean.architecture.settings.CleanArchitectureSettings
 import org.clean.architecture.ui.ArchitectureStyle
 import org.clean.architecture.ui.FeatureDialog
+import org.clean.architecture.ui.Notifier
 
 /**
  * Flutter action in the context menu
@@ -42,74 +43,26 @@ class ActionGenerateFlutter : AnAction() {
     private fun generate(dataContext: DataContext, root: String?, splitSource: Boolean, style: ArchitectureStyle) {
         val project = CommonDataKeys.PROJECT.getData(dataContext) ?: return
         val selected = PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) ?: return
+        val folder = if (selected.isDirectory) selected else selected.parent ?: run {
+            Notifier.error(project, "The selected file has no parent directory")
+            return
+        }
 
         val settings = CleanArchitectureSettings.getInstance()
-        val state = settings.state
+        val plan = try {
+            GenerationPlan.build(
+                root = root,
+                style = style,
+                settings = settings.state,
+                splitSource = splitSource
+            )
+        } catch (e: IllegalArgumentException) {
+            Notifier.error(project, e.message ?: "Invalid directory configuration")
+            return
+        }
 
-        // Resolve layer names: preset value takes priority, falls back to Settings when null
-        val domainName       = style.domainName       ?: state.domainLayerName
-        val dataName         = style.dataName         ?: state.dataLayerName
-        val presentationName = style.presentationName ?: state.presentationLayerName
-
-        var folder = if (selected.isDirectory) selected else selected.parent
         WriteCommandAction.runWriteCommandAction(project) {
-            if (!root.isNullOrBlank()) {
-                val result = Generator.createFolder(
-                    project, folder, root
-                ) ?: return@runWriteCommandAction
-                folder = result[root]
-            }
-
-            // Generate data layer
-            if (splitSource) {
-                val mapOrFalse = Generator.createFolder(
-                    project, folder,
-                    dataName,
-                    state.dataRepositoriesName
-                ) ?: return@runWriteCommandAction
-                mapOrFalse[dataName]?.let { data: VirtualFile ->
-                    Generator.createFolder(
-                        project, data,
-                        "local",
-                        state.dataModelsName, state.dataDataSourcesName
-                    )
-                    Generator.createFolder(
-                        project, data,
-                        "remote",
-                        state.dataModelsName, state.dataDataSourcesName
-                    )
-                }
-            } else {
-                Generator.createFolder(
-                    project, folder,
-                    dataName,
-                    state.dataRepositoriesName, state.dataDataSourcesName, state.dataModelsName
-                )
-            }
-
-            // Generate domain layer
-            Generator.createFolder(
-                project, folder,
-                domainName,
-                state.domainRepositoriesName, state.domainUseCasesName, state.domainEntitiesName
-            )
-
-            // Generate presentation layer
-            Generator.createFolder(
-                project, folder,
-                presentationName,
-                state.presentationManagerName, state.presentationPagesName, state.presentationWidgetsName
-            )
-
-            // Generate extra directories from selected architecture style
-            for (extraDir in style.extraDirectories) {
-                Generator.createFolder(project, folder, extraDir)
-            }
-
-            // Generate custom directories from Settings
-            for (customDir in settings.getCustomDirectoriesList()) {
-                Generator.createFolder(project, folder, customDir)
-            }
+            Generator.createTree(project, folder, plan)
         }
     }
 }
