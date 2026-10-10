@@ -166,9 +166,6 @@ java {
 
 kotlin {
     jvmToolchain(21)
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

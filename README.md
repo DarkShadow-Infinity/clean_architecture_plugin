@@ -129,9 +129,9 @@ Android Studio versions whose runtime is Java 17 as well as newer Java 21-based 
 ./gradlew verifyPlugin
 ```
 
-`verifyPlugin` valida la estructura del plugin y la compatibilidad con las versiones estables y patch
-de Android Studio dentro del mismo rango declarado por `SINCE_BUILD` y `UNTIL_BUILD` (por defecto,
-`261` a `262.*`, Android Studio 2026.1 a 2026.2).
+`verifyPlugin` validates the plugin structure and its compatibility with the stable and patch releases
+of Android Studio within the range declared by `SINCE_BUILD` and `UNTIL_BUILD` (by default, `261` to
+`262.*`, Android Studio 2026.1 to 2026.2).
 
 Signing and publishing values remain optional and can be supplied through Gradle properties or the
 corresponding environment variables. `SINCE_BUILD` and `UNTIL_BUILD` can be overridden through the
