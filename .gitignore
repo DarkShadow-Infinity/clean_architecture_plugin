@@ -44,3 +44,7 @@ atlassian-ide-plugin.xml
 .env
 certificate.pem
 private.key
+
+# macOS / IDE output
+.DS_Store
+/bin/
